@@ -1,13 +1,15 @@
 package application;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import modele.*;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -76,6 +78,7 @@ public class Main {
 
         ObjectMapper mapper = new ObjectMapper();
 
+        // Fichier monFichier.json
         ObjectNode lampe = mapper.createObjectNode();
         lampe.put("nom", l.getNom());
         lampe.put("niveau", l.getNiveau());
@@ -86,10 +89,11 @@ public class Main {
         lampe.set("thermostat", thermostat);
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lampe);
         log.info(json);
-        FileWriter fichier = new FileWriter("monfichier.json");
+        FileWriter fichier = new FileWriter("monFichier.json");
         fichier.write(json);
         fichier.close();
 
+        // Fichier maison.json
         ObjectNode racine = mapper.createObjectNode();
         racine.put("proprietaire", "zmouquet");
         racine.put("version", "1.0");
@@ -100,7 +104,19 @@ public class Main {
             tabAppareils.add(mapper.valueToTree(a));
         }
         racine.set("maison", home);
-        mapper.writeValue(new File("maison.json"), racine);
+        mapper.writerWithDefaultPrettyPrinter()
+                .writeValue(new File("maison.json"), racine);
+
+        // Lecture du fichier maison.json
+        JsonNode lectureRacine = mapper.readTree(new File("maison.json"));
+        String proprietaire = lectureRacine.get("proprietaire").asString();
+        System.out.println(proprietaire);
+        ArrayList<Appareil> newListe = new ArrayList<>();
+        for (JsonNode node : lectureRacine.get("appareils")) {
+            Appareil a = mapper.treeToValue(node, Appareil.class);
+            newListe.add(a);
+        }
+        System.out.println(newListe);
 
 
         int c = 0;
