@@ -43,7 +43,7 @@ public class MachineACafe implements Programmable {
 
     @Override
     public String toString() {
-        String statut = "";
+        String statut;
         if (allume) {
             statut = "allumée";
         } else {

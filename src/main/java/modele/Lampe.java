@@ -48,7 +48,7 @@ public class Lampe implements Reglable {
 
     @Override
     public String toString() {
-        String statut = "";
+        String statut;
         if (allume) {
             statut = "allumée";
         } else {

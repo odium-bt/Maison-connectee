@@ -56,7 +56,7 @@ public class Thermostat implements Programmable, Reglable {
 
     @Override
     public String toString() {
-        String statut = "";
+        String statut;
         if (allume) {
             statut = "allumée";
         } else {
