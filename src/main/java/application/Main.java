@@ -1,7 +1,13 @@
 package application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import modele.*;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -9,7 +15,7 @@ import java.util.Scanner;
 import static utils.Utils.log;
 
 public class Main {
-    static void main() throws InterruptedException {
+    static void main() throws InterruptedException, IOException {
         log.debug("Lancement de l'application");
 
         Scenario toutEteindre = new Scenario() {
@@ -60,10 +66,42 @@ public class Main {
         };
 
         Maison maison = new Maison();
-        maison.ajouter(new Lampe("Lampe salon"));
+        Lampe l = new Lampe("Lampe salon");
+        maison.ajouter(l);
         maison.ajouter(new Lampe("Lampe salle de bain"));
-        maison.ajouter(new Thermostat("Thermostat"));
-        maison.ajouter(new MachineACafe("Machine à café"));
+        Thermostat t = new Thermostat("Thermostat");
+        maison.ajouter(t);
+        MachineACafe m = new MachineACafe("Machine à café");
+        maison.ajouter(m);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode lampe = mapper.createObjectNode();
+        lampe.put("nom", l.getNom());
+        lampe.put("niveau", l.getNiveau());
+        ObjectNode thermostat = mapper.createObjectNode();
+        thermostat.put("nom", t.getNom());
+        thermostat.put("niveau", t.getNiveau());
+        thermostat.put("allume", t.estAllume());
+        lampe.set("thermostat", thermostat);
+        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lampe);
+        log.info(json);
+        FileWriter fichier = new FileWriter("monfichier.json");
+        fichier.write(json);
+        fichier.close();
+
+        ObjectNode racine = mapper.createObjectNode();
+        racine.put("proprietaire", "zmouquet");
+        racine.put("version", "1.0");
+        ObjectNode home = mapper.createObjectNode();
+        home.put("nom", "Maison");
+        ArrayNode tabAppareils = home.putArray("appareils");
+        for (Appareil a : maison.appareils) {
+            tabAppareils.add(mapper.valueToTree(a));
+        }
+        racine.set("maison", home);
+        mapper.writeValue(new File("maison.json"), racine);
+
 
         int c = 0;
         Scanner scan = new Scanner(System.in);

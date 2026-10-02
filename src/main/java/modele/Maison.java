@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Maison {
-    private final List<Appareil> appareils = new ArrayList<>();
+    public final List<Appareil> appareils = new ArrayList<>();
 
     public void ajouter(Appareil a) {
         appareils.add(a);
